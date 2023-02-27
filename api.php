@@ -146,6 +146,14 @@ if (is_ajax() && is_valid()) {
                             }
 
                             break;
+                        case 'getSensors':
+                            if (isset($_GET['way'])) {
+                                $rt->getSensors($_GET['way']);
+                            } else {
+                                $rt->getSensors();
+                            }
+
+                            break;
                         case 'getData':
                             if (isset($_GET['idgraphe'])) {
                                 $rt->getData($_GET['idgraphe']);

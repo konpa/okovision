@@ -115,6 +115,23 @@ class realTime extends connectDb
         $this->sendResponse(json_encode($json));
     }
 
+    public function getSensors()
+    {
+        $json['response'] = false;
+
+        $indic = array_keys($this->_sensors);
+        array_shift($indic);
+        
+        $r = $this->getOkoValue($indic);
+
+        if (!empty($r)) {
+            $json['data'] = $this->_formatSensorsData($r);
+            $json['response'] = true;
+        }
+
+        $this->sendResponse(json_encode($json));
+    }
+
     public function setOkoLogin($user, $pass)
     {
         $pass = base64_encode($this->realEscapeString($pass));
@@ -339,4 +356,27 @@ class realTime extends connectDb
         header('Content-type: text/json; charset=utf-8');
         echo $t;
     }
+
+    private function _formatSensorsData($data)
+    {
+        $sensors_data = [];
+
+        foreach ($data as $key => $sensor) {
+            $sensors_data[$this->_sensors[$key]] = $sensor;
+        }
+
+        return $sensors_data;
+    }
+
+    private $_sensors = [
+        "CAPPL:LOCAL.L_fernwartung_datum_zeit_sek" => "remote_maintenance_datetime",
+        "CAPPL:FA[0].L_kesselstatus" => 'boiler_status',
+        "CAPPL:LOCAL.L_aussentemperatur_ist" => 'outside_temp',
+        "CAPPL:FA[0].L_br1" => 'burner_require',
+        "CAPPL:LOCAL.L_hk[0].pumpe" => 'heater_pump',
+        "CAPPL:LOCAL.L_hk[0].raumtemp_ist" => 'room_temp',
+        "CAPPL:LOCAL.L_hk[0].raumtemp_soll" => 'room_temp_set',
+        "CAPPL:LOCAL.hk[0].raumtemp_heizen" => 'comfort_temp_set',
+        "CAPPL:LOCAL.hk[0].raumtemp_absenken" => 'reduced_temp_set'
+    ];
 }
